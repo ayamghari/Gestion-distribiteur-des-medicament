@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Médicaments</title>
+    <link rel="stylesheet" href="{% static 'listings/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Liste des Médicaments</h1>
+        <div class="actions">
+    <a href="{% url 'ajouter_medicament' %}" class="btn btn-add">Ajouter un Médicament</a>
+</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Quantité en Stock</th>
+                    <th>Prix</th>
+                    <th>Fournisseur</th>
+                    <th>Modifier</th>
+                    <th>Supprimer</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for medicament in medicaments %}
+                <tr>
+                    <td>{{ medicament.nom }}</td>
+                    <td>{{ medicament.quantite_stock }}</td>
+                    <td>{{ medicament.prix }}</td>
+                    <td>{{ medicament.fournisseur.nom }}</td>
+                    
+                    <td><a href="{% url 'modifier_medicament' medicament.id %}" class="btn btn-edit">Modifier</a></td>
+                    <td><a href="{% url 'supprimer_medicament' medicament.id %}" class="btn btn-delete">Supprimer</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'accueil' %}" class="btn">Retour</a>
+    </div>
+</body>
+</html>

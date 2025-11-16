@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Commandes</title>
+    <link rel="stylesheet" href="{% static 'listings/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Liste des Commandes</h1>
+        <div class="actions">
+    <a href="{% url 'ajouter_commande' %}" class="btn btn-add">Ajouter une Commande</a>
+</div>
+        <table>
+    <thead>
+        <tr>
+            <th>Client</th>
+            <th>Médicament</th>
+            <th>Quantité</th>
+            <th>Date</th>
+            <th>Modifier</th>
+            <th>Supprimer</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for commande in commandes %}
+        <tr>
+            <td>{{ commande.client.nom }}</td>
+            <td>{{ commande.medicament.nom }}</td>
+            <td>{{ commande.quantite }}</td>
+            <td>{{ commande.date_commande }}</td>
+            <td><a href="{% url 'modifier_commande' commande.id %}" class="btn btn-edit">Modifier</a></td>
+            <td><a href="{% url 'supprimer_commande' commande.id %}" class="btn btn-delete">Supprimer</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+        <a href="{% url 'accueil' %}" class="btn">Retour</a>
+    </div>
+</body>
+</html>

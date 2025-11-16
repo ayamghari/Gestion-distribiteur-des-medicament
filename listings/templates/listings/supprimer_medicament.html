@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supprimer Médicament</title>
+    <link rel="stylesheet" href="{% static 'listings/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Supprimer Médicament</h1>
+        <div class="confirmation">
+            <p>Êtes-vous sûr de vouloir supprimer le médicament <strong>{{ medicament.nom }}</strong> ?</p>
+            <p><em>Cette action est irréversible et supprimera aussi toutes les commandes associées.</em></p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-delete">Confirmer la suppression</button>
+                <a href="{% url 'liste_medicaments' %}" class="btn">Annuler</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

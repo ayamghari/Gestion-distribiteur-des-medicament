@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supprimer Commande</title>
+    <link rel="stylesheet" href="{% static 'listings/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Supprimer Commande</h1>
+        <div class="confirmation">
+            <p>Êtes-vous sûr de vouloir supprimer la commande <strong>#{{ commande.id }}</strong> ?</p>
+            <p>Client: <strong>{{ commande.client.nom }}</strong></p>
+            <p>Médicament: <strong>{{ commande.medicament.nom }}</strong></p>
+            <p>Date: <strong>{{ commande.date_commande }}</strong></p>
+            <p><em>Cette action est irréversible.</em></p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="  btn btn-delete">Confirmer la suppression</button>
+                <a href="{% url 'liste_commandes' %}" class="btn">Annuler</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

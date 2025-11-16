@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de Pharmacie</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'listings/style.css' %}">
+     <style>
+        body {
+            background-image: url("{% static 'listings/pharmacie.jpeg' %}");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1> Système de gestion d'un Distributeur   des médicaments</h1>
+    
+    <H2>Bienvenue, {{ user.username }}!</H2>
+    
+
+        <div class="buttons">
+            <a href="{% url 'liste_clients' %}" class="btn">Gestion Clients</a>
+            <a href="{% url 'liste_fournisseurs' %}" class="btn">Gestion Fournisseurs</a>
+            <a href="{% url 'liste_medicaments' %}" class="btn">Gestion Médicaments</a>
+            <a href="{% url 'liste_commandes' %}" class="btn">Gestion Commandes</a>
+             <a href="{% url 'deconnexion' %}" class="btn btn-logout">Se déconnecter</a>
+            
+        </div>
+    </div> 
+</body>
+</html>

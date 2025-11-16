@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter Commande</title>
+    <link rel="stylesheet" href="{% static 'listings/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Ajouter une Commande</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.client.id_for_label }}">Client:</label>
+                {{ form.client }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.medicament.id_for_label }}">Médicament:</label>
+                {{ form.medicament }}
+            </div>
+            <div class="form-group">
+    <label for="{{ form.quantite.id_for_label }}">Quantité:</label>
+    {{ form.quantite }}
+</div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-add">Ajouter</button>
+                {% if messages %}
+    {% for message in messages %}
+        {% if 'error' in message.tags %}
+            <div style="padding: 10px; margin-bottom: 15px; border-radius: 5px; background-color: #e74c3c; color: white;">
+                {{ message }}
+            </div>
+        {% else %}
+            <div style="padding: 10px; margin-bottom: 15px; border-radius: 5px; background-color: #27ae60; color: white;">
+                {{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+                <a href="{% url 'liste_commandes' %}" class="btn">Annuler</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

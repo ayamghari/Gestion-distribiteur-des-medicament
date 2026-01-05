@@ -10,15 +10,48 @@
 <body>
     <div class="container">
         <h1>Liste des Clients</h1>
-        
-<div class="actions">
-    <a href="{% url 'ajouter_client' %}" class="btn btn-add">Ajouter un Client</a>
-</div>
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if 'error' in message.tags %}
+                    <div style="padding:10px; margin-bottom:15px; border-radius:5px; background-color:#e74c3c; color:white;">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div style="padding:10px; margin-bottom:15px; border-radius:5px; background-color:#27ae60; color:white;">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <!-- BARRE COMMANDE COMME LISTE COMMANDE -->
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; justify-content:center;">
+            <select onchange="if(this.value) window.location.href='{% url 'liste_clients' %}?q=' + this.value"
+                    style="padding:10px; border:1px solid #ddd; border-radius:5px; font-size:14px; width:220px;">
+                <option value="">Tous les clients</option>
+                {% for client in tous_clients %}
+                    <option value="{{ client.nom }}" {% if query == client.nom %}selected{% endif %}>
+                        {{ client.nom }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <a href="{% url 'ajouter_client' %}" class="btn btn-add" style="white-space:nowrap;">
+                Ajouter client
+            </a>
+
+            <a href="{% url 'accueil' %}" class="btn" style="white-space:nowrap;">
+                Retour
+            </a>
+        </div>
+
         <table>
             <thead>
                 <tr>
                     <th>Nom</th>
                     <th>Téléphone</th>
+                    <th>Adresse</th>
                     <th>Modifier</th>
                     <th>Supprimer</th>
                 </tr>
@@ -28,13 +61,27 @@
                 <tr>
                     <td>{{ client.nom }}</td>
                     <td>{{ client.telephone }}</td>
-                    <td><a href="{% url 'modifier_client' client.id %}" class="btn btn-edit">Modifier</a></td>
-                    <td><a href="{% url 'supprimer_client' client.id %}" class="btn btn-delete">Supprimer</a></td>
+                    <td>{{ client.adresse }}</td>
+                    <td>
+                        <a href="{% url 'modifier_client' client.id %}" class="btn btn-edit">
+                            Modifier
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'supprimer_client' client.id %}" class="btn btn-delete">
+                            Supprimer
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center;">
+                        Aucun client trouvé.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{% url 'accueil' %}" class="btn btn-retour">Retour</a>
     </div>
 </body>
 </html>

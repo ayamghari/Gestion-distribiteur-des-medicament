@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Fournisseurs</title>
+    <title>Liste des Livreurs</title>
     <link rel="stylesheet" href="{% static 'listings/style.css' %}">
 </head>
 <body>
     <div class="container">
-        <h1>Liste des Fournisseurs</h1>
+        <h1>Liste des Livreurs</h1>
         {% if messages %}
             {% for message in messages %}
                 {% if 'error' in message.tags %}
@@ -24,10 +24,12 @@
             {% endfor %}
         {% endif %}
 
+        
         <div class="actions">
-    <a href="{% url 'ajouter_fournisseur' %}" class="btn btn-add">Ajouter un Fournisseur</a>
-     <a href="{% url 'accueil' %}" class="btn btn-retour">Retour</a>  
-</div>
+            <a href="{% url 'ajouter_livreur' %}" class="btn btn-add">Ajouter un Livreur</a>
+             <a href="{% url 'accueil' %}" class="btn btn-retour">Retour</a>  
+        </div>
+        
         <table>
             <thead>
                 <tr>
@@ -38,19 +40,17 @@
                 </tr>
             </thead>
             <tbody>
-                {% for fournisseur in fournisseurs %}
+                {% for livreur in livreurs %}
                 <tr>
-                    <td>{{ fournisseur.nom }}</td>
-                    <td>{{ fournisseur.telephone }}</td>
-                    <td><a href="{% url 'modifier_fournisseur' fournisseur.id %}" class="btn btn-edit">Modifier</a></td>
-                    <td><a href="{% url 'supprimer_fournisseur' fournisseur.id %}" class="btn btn-delete">Supprimer</a></td>
+                    <td>{{ livreur.nom }}</td>
+                    <td>{{ livreur.telephone }}</td>
+                    <td><a href="{% url 'modifier_livreur' livreur.id %}" class="btn btn-edit">Modifier</a></td>
+                    <td><a href="{% url 'supprimer_livreur' livreur.id %}" class="btn btn-delete">Supprimer</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         
     </div>
-    
-
 </body>
 </html>

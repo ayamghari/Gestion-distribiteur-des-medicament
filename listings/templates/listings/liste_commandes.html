@@ -10,34 +10,88 @@
 <body>
     <div class="container">
         <h1>Liste des Commandes</h1>
-        <div class="actions">
-    <a href="{% url 'ajouter_commande' %}" class="btn btn-add">Ajouter une Commande</a>
-</div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                {% if 'error' in message.tags %}
+                    <div style="padding:10px; margin-bottom:15px; border-radius:5px; background-color:#e74c3c; color:white;">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div style="padding:10px; margin-bottom:15px; border-radius:5px; background-color:#27ae60; color:white;">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; justify-content: center;">
+            <select onchange="if(this.value) window.location.href='{% url 'liste_commandes' %}?client=' + this.value" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; width: 200px;">
+                <option value="">Tous les clients</option>
+                {% for client in tous_clients %}
+                    <option value="{{ client.nom }}" {% if query_client == client.nom %}selected{% endif %}>{{ client.nom }}</option>
+                {% endfor %}
+            </select>
+            
+            <select onchange="window.location.href=this.value" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; width: 200px;">
+                <option value="{% url 'liste_commandes' %}" {% if not statut_filtre %}selected{% endif %}>Tous les commandes</option>
+                <option value="{% url 'liste_commandes' %}?statut=en_cours" {% if statut_filtre == 'en_cours' %}selected{% endif %}>  commandes En cours</option>
+                <option value="{% url 'liste_commandes' %}?statut=livree" {% if statut_filtre == 'livree' %}selected{% endif %}> commandes Livrée</option>
+                <option value="{% url 'liste_commandes' %}?statut=annulee" {% if statut_filtre == 'annulee' %}selected{% endif %}> commandes Annulée</option>
+            </select>
+            
+            <a href="{% url 'ajouter_commande' %}" class="btn btn-add" style="white-space: nowrap;">Ajouter commande_</a>
+            <a href="{% url 'accueil' %}" class="btn" style="white-space: nowrap;">Retour</a>
+        </div>
+        
         <table>
-    <thead>
-        <tr>
-            <th>Client</th>
-            <th>Médicament</th>
-            <th>Quantité</th>
-            <th>Date</th>
-            <th>Modifier</th>
-            <th>Supprimer</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for commande in commandes %}
-        <tr>
-            <td>{{ commande.client.nom }}</td>
-            <td>{{ commande.medicament.nom }}</td>
-            <td>{{ commande.quantite }}</td>
-            <td>{{ commande.date_commande }}</td>
-            <td><a href="{% url 'modifier_commande' commande.id %}" class="btn btn-edit">Modifier</a></td>
-            <td><a href="{% url 'supprimer_commande' commande.id %}" class="btn btn-delete">Supprimer</a></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-        <a href="{% url 'accueil' %}" class="btn">Retour</a>
+            <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Médicament</th>
+                    <th>Quantité</th>
+                    <th>Date</th>
+                    <th>Livreur</th>
+                    <th>Statut</th>
+                    <th>Modifier</th>
+                    <th>Supprimer</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for commande in commandes %}
+                <tr>
+                    <td>{{ commande.client.nom }}</td>
+                    <td>{{ commande.medicament.nom }}</td>
+                    <td>{{ commande.quantite }}</td>
+                    <td>{{ commande.date_commande }}</td>
+                    <td>{{ commande.livreur.nom|default:"Non assigné" }}</td>
+                    <td>
+                        <form method="post" action="{% url 'changer_statut_commande' commande.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <select name="statut" onchange="this.form.submit()" style="padding: 8px; border-radius: 5px; border: 2px solid; font-weight: bold;
+                            {% if commande.statut == 'en_cours' %}
+                                background-color: #f39c12; color: white; border-color: #f39c12;
+                            {% elif commande.statut == 'livree' %}
+                                background-color: #27ae60; color: white; border-color: #27ae60;
+                            {% elif commande.statut == 'annulee' %}
+                                background-color: #e74c3c; color: white; border-color: #e74c3c;
+                            {% endif %}">
+                                <option value="en_cours" {% if commande.statut == 'en_cours' %}selected{% endif %}>En cours</option>
+                                <option value="livree" {% if commande.statut == 'livree' %}selected{% endif %}>Livrée</option>
+                                <option value="annulee" {% if commande.statut == 'annulee' %}selected{% endif %}>Annulée</option>
+                            </select>
+                        </form>
+                    </td>
+                    <td><a href="{% url 'modifier_commande' commande.id %}" class="btn btn-edit">Modifier</a></td>
+                    <td><a href="{% url 'supprimer_commande' commande.id %}" class="btn btn-delete">Supprimer</a></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center;">Aucune commande trouvée.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </body>
 </html>

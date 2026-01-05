@@ -10,9 +10,54 @@
 <body>
     <div class="container">
         <h1>Liste des Médicaments</h1>
-        <div class="actions">
-    <a href="{% url 'ajouter_medicament' %}" class="btn btn-add">Ajouter un Médicament</a>
-</div>
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if 'error' in message.tags %}
+                    <div style="padding:10px; margin-bottom:15px; border-radius:5px; background-color:#e74c3c; color:white;">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div style="padding:10px; margin-bottom:15px; border-radius:5px; background-color:#27ae60; color:white;">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; justify-content: center;">
+            <select onchange="if(this.value) window.location.href='{% url 'liste_medicaments' %}?q=' + this.value"
+                    style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; width: 200px;">
+                <option value="">Tous les médicaments</option>
+                {% for med in tous_medicaments %}
+                    <option value="{{ med.nom }}" {% if query == med.nom %}selected{% endif %}>
+                        {{ med.nom }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select onchange="window.location.href=this.value"
+                    style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; width: 200px;">
+                <option value="{% url 'liste_medicaments' %}" {% if not filtre_stock %}selected{% endif %}>
+                    Tous les stocks
+                </option>
+                <option value="{% url 'liste_medicaments' %}?stock=faible" {% if filtre_stock == 'faible' %}selected{% endif %}>
+                    Stock &lt; 10
+                </option>
+                <option value="{% url 'liste_medicaments' %}?stock=vide" {% if filtre_stock == 'vide' %}selected{% endif %}>
+                    Stock = 0
+                </option>
+            </select>
+
+            <a href="{% url 'ajouter_medicament' %}" class="btn btn-add" style="white-space: nowrap;">
+                Ajouter
+            </a>
+
+            <a href="{% url 'accueil' %}" class="btn" style="white-space: nowrap;">
+                Retour
+            </a>
+        </div>
+
         <table>
             <thead>
                 <tr>
@@ -22,7 +67,6 @@
                     <th>Fournisseur</th>
                     <th>Modifier</th>
                     <th>Supprimer</th>
-                    
                 </tr>
             </thead>
             <tbody>
@@ -30,16 +74,28 @@
                 <tr>
                     <td>{{ medicament.nom }}</td>
                     <td>{{ medicament.quantite_stock }}</td>
-                    <td>{{ medicament.prix }}</td>
+                    <td>{{ medicament.prix }} DH</td>
                     <td>{{ medicament.fournisseur.nom }}</td>
-                    
-                    <td><a href="{% url 'modifier_medicament' medicament.id %}" class="btn btn-edit">Modifier</a></td>
-                    <td><a href="{% url 'supprimer_medicament' medicament.id %}" class="btn btn-delete">Supprimer</a></td>
+                    <td>
+                        <a href="{% url 'modifier_medicament' medicament.id %}" class="btn btn-edit">
+                            Modifier
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'supprimer_medicament' medicament.id %}" class="btn btn-delete">
+                            Supprimer
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">
+                        Aucun médicament trouvé.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{% url 'accueil' %}" class="btn">Retour</a>
     </div>
 </body>
 </html>

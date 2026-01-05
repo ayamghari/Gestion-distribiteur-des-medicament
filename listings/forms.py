@@ -1,13 +1,14 @@
 from django import forms
-from .models import Client, Fournisseur, Medicament, Commande
+from .models import Client, Fournisseur, Medicament, Commande, Livreur
 
 class ClientForm(forms.ModelForm):
     class Meta:
         model = Client
-        fields = ['nom', 'telephone']
+        fields = ['nom', 'telephone', 'adresse']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom du client'}),
             'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Numéro de téléphone'}),
+            'adresse': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Adresse du client'}),
         }
 
 class FournisseurForm(forms.ModelForm):
@@ -33,9 +34,18 @@ class MedicamentForm(forms.ModelForm):
 class CommandeForm(forms.ModelForm):
     class Meta:
         model = Commande
-        fields = ['client', 'medicament', 'quantite']
+        fields = ['client', 'medicament', 'quantite', 'livreur']
         widgets = {
             'client': forms.Select(attrs={'class': 'form-control'}),
             'medicament': forms.Select(attrs={'class': 'form-control'}),
             'quantite': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'livreur': forms.Select(attrs={'class': 'form-control'}),
+        }
+class LivreurForm(forms.ModelForm):
+    class Meta:
+        model = Livreur
+        fields = ['nom', 'telephone']
+        widgets = {
+            'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom du livreur'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Numéro de téléphone'}),
         }

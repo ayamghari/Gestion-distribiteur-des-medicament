@@ -4,13 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter Client</title>
+    <title>Modifier Livreur</title>
     <link rel="stylesheet" href="{% static 'listings/style.css' %}">
 </head>
 <body>
     <div class="container">
-        <h1>Ajouter un Client</h1>
-        
+        <h1>Modifier Livreur</h1>
         <form method="post">
             {% csrf_token %}
             <div class="form-group">
@@ -21,13 +20,9 @@
                 <label for="{{ form.telephone.id_for_label }}">Téléphone:</label>
                 {{ form.telephone }}
             </div>
-                <div class="form-group">
-               <label for="{{ form.adresse.id_for_label }}">Adresse:</label>
-               {{ form.adresse }}
-            </div>
             <div class="form-actions">
-                <button type="submit" class="btn btn-add">Ajouter</button>
-                <a href="{% url 'liste_clients' %}" class="btn">Annuler</a>
+                <button type="submit" class="btn btn-edit">Modifier</button>
+                <a href="{% url 'liste_livreurs' %}" class="btn">Annuler</a>
             </div>
         </form>
     </div>

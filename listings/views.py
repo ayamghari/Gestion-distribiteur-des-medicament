@@ -292,6 +292,55 @@ def supprimer_commande(request, id):
         messages.success(request, 'Commande supprimée avec succès!')
         return redirect('liste_commandes')
     return render(request, 'listings/supprimer_commande.html', {'commande': commande})
+@login_required
+def modifier_commande_client(request, id):
+    commande = get_object_or_404(
+        Commande,
+        id=id,
+        client__user=request.user
+    )
+
+    if request.method == 'POST':
+        nouvelle_quantite = int(request.POST.get('quantite', 0))
+        ancienne_quantite = commande.quantite
+        medicament = commande.medicament
+
+        difference = nouvelle_quantite - ancienne_quantite
+
+        if nouvelle_quantite <= 0:
+            messages.error(request, "Quantité invalide")
+        elif medicament.quantite_stock < difference:
+            messages.error(request, "Stock insuffisant")
+        else:
+            medicament.quantite_stock -= difference
+            medicament.save()
+
+            commande.quantite = nouvelle_quantite
+            commande.save()
+
+            messages.success(request, "Commande modifiée avec succès")
+            return redirect('espace_client')
+
+    return render(request, 'client/modifier_commande.html', {
+        'commande': commande
+    })
+  
+@login_required
+def supprimer_commande_client(request, id):
+    client = Client.objects.get(user=request.user)
+    commande = get_object_or_404(Commande, id=id, client=client)
+
+    if commande.statut != 'en_cours':
+        messages.error(request, "Impossible de supprimer cette commande")
+        return redirect('espace_client')
+
+    medicament = commande.medicament
+    medicament.quantite_stock += commande.quantite
+    medicament.save()
+
+    commande.delete()
+    messages.success(request, "Commande supprimée")
+    return redirect('espace_client')
 
 @login_required
 def changer_statut_commande(request, id):
@@ -302,18 +351,72 @@ def changer_statut_commande(request, id):
         messages.success(request, 'Statut changé avec succès!')
     return redirect('liste_commandes')
 
+@login_required
+def espace_client(request):
+    client = Client.objects.get(user=request.user)
+    medicaments = Medicament.objects.all()
+    commandes = Commande.objects.filter(client=client)
+
+    if request.method == 'POST':
+
+        # ===== MODIFIER INFOS CLIENT =====
+        if 'update_client' in request.POST:
+            client.nom = request.POST.get('nom', client.nom)
+            client.telephone = request.POST.get('telephone', client.telephone)
+            client.adresse = request.POST.get('adresse', client.adresse)
+            client.save()
+            messages.success(request, "Informations mises à jour avec succès")
+
+        # ===== COMMANDER =====
+        elif 'commander' in request.POST:
+            medicament_id = request.POST.get('medicament')
+            quantite = int(request.POST.get('quantite', 0))
+
+            medicament = Medicament.objects.get(id=medicament_id)
+
+            if quantite <= 0:
+                messages.error(request, "Quantité invalide")
+            elif medicament.quantite_stock < quantite:
+                messages.error(request, "Stock insuffisant")
+            else:
+                medicament.quantite_stock -= quantite
+                medicament.save()
+
+                Commande.objects.create(
+                    client=client,
+                    medicament=medicament,
+                    quantite=quantite,
+                    statut='en_cours'
+                )
+
+                messages.success(request, "Commande enregistrée avec succès")
+
+    return render(request, 'client/espace_client.html', {
+        'client': client,
+        'medicaments': medicaments,
+        'commandes': commandes
+    })
+
 # === Authentification ===
 def connexion(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+        user = authenticate(
+            request,
+            username=request.POST['username'],
+            password=request.POST['password']
+        )
+
+        if user:
             login(request, user)
-            return redirect('accueil')
+            if user.is_staff:
+                return redirect('accueil')
+            else:
+                return redirect('espace_client')
         else:
-            messages.error(request, 'Nom d\'utilisateur ou mot de passe incorrect.')
+            messages.error(request, 'Identifiants incorrects')
+
     return render(request, 'listings/connexion.html')
+
 
 def inscription(request):
     if request.method == 'POST':
@@ -321,23 +424,26 @@ def inscription(request):
         password1 = request.POST['password1']
         password2 = request.POST['password2']
         email = request.POST['email']
-        
+
         if password1 != password2:
             messages.error(request, 'Les mots de passe ne correspondent pas.')
-        elif len(password1) < 8:
-            messages.error(request, 'Le mot de passe doit contenir au moins 8 caractères.')
-        elif User.objects.filter(username=username).exists():
-            messages.error(request, 'Ce nom d\'utilisateur existe déjà.')
-        elif User.objects.filter(email=email).exists():
-            messages.error(request, 'Cet email est déjà utilisé.')
         else:
-            try:
-                validate_password(password1)
-                user = User.objects.create_user(username=username, password=password1, email=email)
-                messages.success(request, 'Compte créé avec succès! Vous pouvez maintenant vous connecter.')
-                return redirect('connexion')
-            except ValidationError as e:
-                messages.error(request, ' '.join(e.messages))
+            user = User.objects.create_user(
+                username=username,
+                password=password1,
+                email=email,
+                is_staff=False
+            )
+
+            Client.objects.create(
+                user=user,
+                nom=username,
+                telephone=''
+            )
+
+            messages.success(request, 'Compte créé avec succès.')
+            return redirect('connexion')
+
     return render(request, 'listings/inscription.html')
 
 def deconnexion(request):

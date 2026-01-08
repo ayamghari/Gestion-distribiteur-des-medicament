@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - Gestion de distributeur des médicaments</title>
+    <title>Connexion - Gestion distributeur des médicaments</title>
     <link rel="stylesheet" href="{% static 'listings/style.css' %}">
     <style>
         body {
@@ -20,18 +20,11 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
-            margin-top: 100PX;
+            margin: 100px auto;
         }
         .login-header {
             text-align: center;
             margin-bottom: 30px;
-        }
-        .login-header h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        .login-header p {
-            color: #7f8c8d;
         }
         .form-group {
             margin-bottom: 20px;
@@ -52,7 +45,6 @@
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
-            margin-bottom: 15px;
         }
         .btn-login:hover {
             background-color: #2980b9;
@@ -62,14 +54,12 @@
             margin-top: 20px;
         }
         .signup-link a {
-            color: #3498db;
+            color: #27ae60;
+            font-weight: bold;
             text-decoration: none;
         }
         .signup-link a:hover {
             text-decoration: underline;
-        }
-        .messages {
-            margin-bottom: 20px;
         }
         .messages .error {
             background-color: #e74c3c;
@@ -81,32 +71,38 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <h1>Connexion</h1>
-            <p>Accédez à votre espace de gestion</p>
-        </div>
 
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <input type="text" name="username" placeholder="Nom d'utilisateur" required>
-            </div>
-            <div class="form-group">
-                <input type="password" name="password" placeholder="Mot de passe" required>
-            </div>
-            <button type="submit" class="btn-login">Se connecter</button>
-        </form>
-
-        
+<div class="login-container">
+    <div class="login-header">
+        <h1>Connexion</h1>
+        <p>Accédez à votre espace</p>
     </div>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+        </div>
+        <div class="form-group">
+            <input type="password" name="password" placeholder="Mot de passe" required>
+        </div>
+        <button type="submit" class="btn-login">Se connecter</button>
+    </form>
+
+    <!-- ✅ LIEN CRÉER COMPTE -->
+    <div class="signup-link">
+        <p>Vous n’avez pas de compte ?</p>
+        <a href="{% url 'inscription' %}">Créer un compte client</a>
+    </div>
+</div>
+
 </body>
 </html>

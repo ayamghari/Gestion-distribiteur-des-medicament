@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier commande</title>
+    <link rel="stylesheet" href="{% static 'listings/style.css' %}">
+</head>
+<body>
+
+<div class="container">
+    <h1>Modifier ma commande</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label>Médicament</label>
+        <input type="text" value="{{ commande.medicament.nom }}" disabled>
+
+        <label>Quantité</label>
+        <input type="number" name="quantite" value="{{ commande.quantite }}" min="1" required>
+
+        <button type="submit">Enregistrer</button>
+        <a href="{% url 'espace_client' %}" class="btn btn-retour">Retour</a>
+    </form>
+</div>
+
+</body>
+</html>

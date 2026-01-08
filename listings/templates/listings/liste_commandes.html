@@ -45,53 +45,57 @@
         </div>
         
         <table>
-            <thead>
-                <tr>
-                    <th>Client</th>
-                    <th>Médicament</th>
-                    <th>Quantité</th>
-                    <th>Date</th>
-                    <th>Livreur</th>
-                    <th>Statut</th>
-                    <th>Modifier</th>
-                    <th>Supprimer</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for commande in commandes %}
-                <tr>
-                    <td>{{ commande.client.nom }}</td>
-                    <td>{{ commande.medicament.nom }}</td>
-                    <td>{{ commande.quantite }}</td>
-                    <td>{{ commande.date_commande }}</td>
-                    <td>{{ commande.livreur.nom|default:"Non assigné" }}</td>
-                    <td>
-                        <form method="post" action="{% url 'changer_statut_commande' commande.id %}" style="display: inline;">
-                            {% csrf_token %}
-                            <select name="statut" onchange="this.form.submit()" style="padding: 8px; border-radius: 5px; border: 2px solid; font-weight: bold;
-                            {% if commande.statut == 'en_cours' %}
-                                background-color: #f39c12; color: white; border-color: #f39c12;
-                            {% elif commande.statut == 'livree' %}
-                                background-color: #27ae60; color: white; border-color: #27ae60;
-                            {% elif commande.statut == 'annulee' %}
-                                background-color: #e74c3c; color: white; border-color: #e74c3c;
-                            {% endif %}">
-                                <option value="en_cours" {% if commande.statut == 'en_cours' %}selected{% endif %}>En cours</option>
-                                <option value="livree" {% if commande.statut == 'livree' %}selected{% endif %}>Livrée</option>
-                                <option value="annulee" {% if commande.statut == 'annulee' %}selected{% endif %}>Annulée</option>
-                            </select>
-                        </form>
-                    </td>
-                    <td><a href="{% url 'modifier_commande' commande.id %}" class="btn btn-edit">Modifier</a></td>
-                    <td><a href="{% url 'supprimer_commande' commande.id %}" class="btn btn-delete">Supprimer</a></td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="8" style="text-align: center;">Aucune commande trouvée.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <thead>
+        <tr>
+            <th>Client</th>
+            <th>Médicament</th>
+            <th>Quantité</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for commande in commandes %}
+        <tr>
+            <td>{{ commande.client.nom }}</td>
+            <td>{{ commande.medicament.nom }}</td>
+            <td>{{ commande.quantite }}</td>
+            <td>{{ commande.date_commande }}</td>
+
+            <!-- 🔵 STATUT MODIFIABLE -->
+            <td>
+                <form method="post" action="{% url 'changer_statut_commande' commande.id %}">
+                    {% csrf_token %}
+                    <select name="statut" onchange="this.form.submit()">
+                        <option value="en_cours" {% if commande.statut == 'en_cours' %}selected{% endif %}>
+                            En cours
+                        </option>
+                        <option value="livree" {% if commande.statut == 'livree' %}selected{% endif %}>
+                            Livrée
+                        </option>
+                        <option value="annulee" {% if commande.statut == 'annulee' %}selected{% endif %}>
+                            Annulée
+                        </option>
+                    </select>
+                </form>
+            </td>
+
+            <td>
+                <a href="{% url 'modifier_commande' commande.id %}" class="btn btn-edit">Modifier</a>
+                <a href="{% url 'supprimer_commande' commande.id %}" class="btn btn-delete">Supprimer</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" style="text-align:center;">Aucune commande trouvée</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
     </div>
 </body>
 </html>

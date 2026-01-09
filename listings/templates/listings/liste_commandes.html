@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des Commandes</title>
     <link rel="stylesheet" href="{% static 'listings/style.css' %}">
+    <style>
+    body {
+        background-image: url("{% static 'listings/pharmacie.jpeg' %}") !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-attachment: fixed !important;
+    }
+</style>
 </head>
 <body>
     <div class="container">
@@ -35,66 +43,85 @@
             
             <select onchange="window.location.href=this.value" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; width: 200px;">
                 <option value="{% url 'liste_commandes' %}" {% if not statut_filtre %}selected{% endif %}>Tous les commandes</option>
-                <option value="{% url 'liste_commandes' %}?statut=en_cours" {% if statut_filtre == 'en_cours' %}selected{% endif %}>  commandes En cours</option>
-                <option value="{% url 'liste_commandes' %}?statut=livree" {% if statut_filtre == 'livree' %}selected{% endif %}> commandes Livrée</option>
-                <option value="{% url 'liste_commandes' %}?statut=annulee" {% if statut_filtre == 'annulee' %}selected{% endif %}> commandes Annulée</option>
+                <option value="{% url 'liste_commandes' %}?statut=en_cours" {% if statut_filtre == 'en_cours' %}selected{% endif %}>Commandes En cours</option>
+                <option value="{% url 'liste_commandes' %}?statut=livree" {% if statut_filtre == 'livree' %}selected{% endif %}>Commandes Livrée</option>
+                <option value="{% url 'liste_commandes' %}?statut=annulee" {% if statut_filtre == 'annulee' %}selected{% endif %}>Commandes Annulée</option>
             </select>
             
-            <a href="{% url 'ajouter_commande' %}" class="btn btn-add" style="white-space: nowrap;">Ajouter commande_</a>
+            <a href="{% url 'ajouter_commande' %}" class="btn btn-add" style="white-space: nowrap;">Ajouter commande</a>
             <a href="{% url 'accueil' %}" class="btn" style="white-space: nowrap;">Retour</a>
         </div>
         
         <table>
-    <thead>
-        <tr>
-            <th>Client</th>
-            <th>Médicament</th>
-            <th>Quantité</th>
-            <th>Date</th>
-            <th>Statut</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
+            <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Médicament</th>
+                    <th>Quantité</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Livreur</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
 
-    <tbody>
-        {% for commande in commandes %}
-        <tr>
-            <td>{{ commande.client.nom }}</td>
-            <td>{{ commande.medicament.nom }}</td>
-            <td>{{ commande.quantite }}</td>
-            <td>{{ commande.date_commande }}</td>
+            <tbody>
+                {% for commande in commandes %}
+                <tr>
+                    <td>{{ commande.client.nom }}</td>
+                    <td>{{ commande.medicament.nom }}</td>
+                    <td>{{ commande.quantite }}</td>
+                    <td>{{ commande.date_commande }}</td>
 
-            <!-- 🔵 STATUT MODIFIABLE -->
-            <td>
-                <form method="post" action="{% url 'changer_statut_commande' commande.id %}">
-                    {% csrf_token %}
-                    <select name="statut" onchange="this.form.submit()">
-                        <option value="en_cours" {% if commande.statut == 'en_cours' %}selected{% endif %}>
-                            En cours
-                        </option>
-                        <option value="livree" {% if commande.statut == 'livree' %}selected{% endif %}>
-                            Livrée
-                        </option>
-                        <option value="annulee" {% if commande.statut == 'annulee' %}selected{% endif %}>
-                            Annulée
-                        </option>
-                    </select>
-                </form>
-            </td>
+                    <!-- Statut avec couleurs -->
+                    <td>
+                        <form method="post" action="{% url 'changer_statut_commande' commande.id %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <select name="statut" onchange="this.form.submit()" class="statut-select statut-{{ commande.statut }}">
+                                <option value="en_cours" {% if commande.statut == 'en_cours' %}selected{% endif %}>
+                                    ⏳ En cours
+                                </option>
+                                <option value="livree" {% if commande.statut == 'livree' %}selected{% endif %}>
+                                    ✅ Livrée
+                                </option>
+                                <option value="annulee" {% if commande.statut == 'annulee' %}selected{% endif %}>
+                                    ❌ Annulée
+                                </option>
+                            </select>
+                        </form>
+                    </td>
 
-            <td>
-                <a href="{% url 'modifier_commande' commande.id %}" class="btn btn-edit">Modifier</a>
-                <a href="{% url 'supprimer_commande' commande.id %}" class="btn btn-delete">Supprimer</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="6" style="text-align:center;">Aucune commande trouvée</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                    <!-- Livreur (bloqué si annulée) -->
+                    <td>
+                        {% if commande.statut == 'annulee' %}
+                            <span style="color: #95a5a6; font-style: italic;">Non applicable</span>
+                        {% else %}
+                            <form method="post" action="{% url 'affecter_livreur' commande.id %}" style="margin: 0;">
+                                {% csrf_token %}
+                                <select name="livreur_id" onchange="this.form.submit()" class="livreur-select">
+                                    <option value="">➕ Non assigné</option>
+                                    {% for livreur in livreurs %}
+                                        <option value="{{ livreur.id }}" {% if commande.livreur and commande.livreur.id == livreur.id %}selected{% endif %}>
+                                            🚚 {{ livreur.nom }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        {% endif %}
+                    </td>
 
+                    <td>
+                        <a href="{% url 'modifier_commande' commande.id %}" class="btn btn-edit">Modifier</a>
+                        <a href="{% url 'supprimer_commande' commande.id %}" class="btn btn-delete">Supprimer</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align:center;">Aucune commande trouvée</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
     </div>
 </body>

@@ -210,26 +210,40 @@ def supprimer_medicament(request, id):
 def liste_commandes(request):
     statut_filtre = request.GET.get('statut', '')
     query_client = request.GET.get('client', '')
-    
-    # Obtenir tous les clients pour la liste déroulante
+
     tous_clients = Client.objects.all()
     commandes = Commande.objects.all()
-    
-    # Filtre par client
+    livreurs = Livreur.objects.all()  # 👈 IMPORTANT
+
     if query_client:
         commandes = commandes.filter(client__nom__icontains=query_client)
-    
-    # Filtre par statut
+
     if statut_filtre:
         commandes = commandes.filter(statut=statut_filtre)
-    
+
     return render(request, 'listings/liste_commandes.html', {
         'commandes': commandes,
         'tous_clients': tous_clients,
         'statut_filtre': statut_filtre,
-        'query_client': query_client
+        'query_client': query_client,
+        'livreurs': livreurs,  # 👈 IMPORTANT
     })
-
+@login_required
+def affecter_livreur(request, id):
+    if request.method == 'POST':
+        commande = get_object_or_404(Commande, id=id)
+        livreur_id = request.POST.get('livreur_id')
+        
+        if livreur_id:
+            livreur = get_object_or_404(Livreur, id=livreur_id)
+            commande.livreur = livreur
+        else:
+            commande.livreur = None
+        
+        commande.save()
+        messages.success(request, 'Livreur affecté avec succès !')
+        
+    return redirect('liste_commandes')
 @login_required
 def ajouter_commande(request):
     if request.method == 'POST':
@@ -396,6 +410,23 @@ def espace_client(request):
         'medicaments': medicaments,
         'commandes': commandes
     })
+@login_required
+def affecter_livreur(request, id):
+    commande = get_object_or_404(Commande, id=id)
+
+    if request.method == "POST":
+        livreur_id = request.POST.get("livreur")
+
+        if livreur_id:
+            livreur = get_object_or_404(Livreur, id=livreur_id)
+            commande.livreur = livreur
+        else:
+            commande.livreur = None
+
+        commande.save()
+        messages.success(request, "Livreur affecté avec succès")
+
+    return redirect("liste_commandes")
 
 # === Authentification ===
 def connexion(request):

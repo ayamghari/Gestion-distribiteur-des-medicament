@@ -43,6 +43,8 @@ urlpatterns = [
     path('modifier-commande/<int:id>/', views.modifier_commande, name='modifier_commande'),
     path('supprimer-commande/<int:id>/', views.supprimer_commande, name='supprimer_commande'),
     path('changer-statut/<int:id>/', views.changer_statut_commande, name='changer_statut_commande'),
+    path('affecter-livreur/<int:id>/', views.affecter_livreur, name='affecter_livreur'),
+
     path(
     'client/commande/modifier/<int:id>/',
     views.modifier_commande_client,
